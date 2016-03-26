@@ -27,7 +27,14 @@
 
 ## 直接处理类型值
 
+字符
 > string := config.String(config.Config["app"].Get("mysql", "default"))
+
+整数
 > int := config.Int(config.Config["app"].Get("mysql", "default"))
+
+浮点数
 > float64 := config.Float64(config.Config["app"].Get("mysql", "default"))
+
+布尔值
 > bool := config.bool(config.Config["app"].Get("mysql", "default"))
