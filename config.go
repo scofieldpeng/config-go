@@ -12,17 +12,17 @@ import (
 type conf map[string]ini.File
 
 // 对外提供的config参数
-var Config conf
+var Config  = conf{}
 
 // 是否为测试环境
 var debug bool
 
 // SetDebug 设置测试环境
-func SetDebug(debug bool) {
-	debug = debug
+func SetDebug(b bool) {
+	debug = b
 }
 
-// Init 开始
+// Init 初始化配置文件
 func (c *conf) Init() {
 	// 加载所有的配置文件
 	var pattern string
@@ -56,6 +56,12 @@ func (c *conf) Watch() {
 	if err != nil {
 		log.Panic(err)
 	}
+	defer watcher.Close()
+
+	err = watcher.Watch(configPath)
+	if err != nil {
+		log.Panic(err)
+	}
 
 	fileSuffix := c.fileSuffix()
 
@@ -69,7 +75,7 @@ func (c *conf) Watch() {
 
 			// 当为删除、重命名操作时，删除对应的配置项
 			if v.IsDelete() || v.IsRename() {
-				delete(c, c.fileKey(v.Name))
+				delete((*c), c.fileKey(v.Name))
 			}
 
 			// 当为修改、创建操作时
@@ -83,17 +89,18 @@ func (c *conf) Watch() {
 
 // loadFile 加载配置文件
 func (c *conf) loadFile(filePath string) bool {
-	if tmp, err := ini.LoadFile(filePath); err != nil {
+	tmp, err := ini.LoadFile(filePath)
+	if err != nil {
 		log.Warring(err)
 		return false
-	} else {
-		// 计算文件的名称
-		c[c.fileKey()] = tmp
 	}
+	// 计算文件的名称
+	(*c)[c.fileKey(filePath)] = tmp
+	return true
 }
 
 // fileKey　通过文件地址获取文件对应的key
-func (c *conf) fileKey(filePath) string {
+func (c *conf) fileKey(filePath string) string {
 	return strings.Replace(filepath.Base(filePath), c.fileSuffix(), "", -1)
 }
 
@@ -105,6 +112,7 @@ func (c *conf) fileSuffix() string {
 	} else {
 		fileSuffix = ".ini"
 	}
+	return fileSuffix
 }
 
 // ConfigPath 获取配置文件存储目录
