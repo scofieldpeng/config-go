@@ -24,6 +24,11 @@ func SetDebug(b bool) {
 	log.SetDebug(b)
 }
 
+// Debug 返回debug状态
+func Debug() bool {
+	return debug
+}
+
 const (
 	NORAML_SUFFIX = ".ini"       // 正常配置文件后缀
 	DEBUG_SUFFIX  = "_debug.ini" // debug模式配置文件后缀
