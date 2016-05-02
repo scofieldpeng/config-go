@@ -2,20 +2,21 @@ package config
 
 import (
 	"fmt"
-	"git.name.im/bamboo/log.git"
-	"github.com/howeyc/fsnotify"
-	"github.com/vaughan0/go-ini"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"git.name.im/bamboo/log.git"
+	"github.com/howeyc/fsnotify"
+	"github.com/vaughan0/go-ini"
 )
 
 type conf map[string]ini.File
 
-// 对外提供的config参数
+// Config 对外提供的config参数
 var Config = conf{}
 
-// 是否为测试环境
+//  是否为测试环境
 var debug bool
 
 // SetDebug 设置测试环境
@@ -30,14 +31,16 @@ func Debug() bool {
 }
 
 const (
-	NORAML_SUFFIX = ".ini"       // 正常配置文件后缀
-	DEBUG_SUFFIX  = "_debug.ini" // debug模式配置文件后缀
+	// NoramlSuffix 正常配置文件后缀
+	NoramlSuffix = ".ini"
+	// DebugSuffix debug模式配置文件后缀
+	DebugSuffix = "_debug.ini"
 )
 
 // Init 初始化配置文件
 func (c *conf) Init() {
 	// 加载所有的配置文件
-	pattern := fmt.Sprintf("%s*%s", c.ConfigPath(), NORAML_SUFFIX)
+	pattern := fmt.Sprintf("%s*%s", c.ConfigPath(), NoramlSuffix)
 
 	// 扫描目录找到配置文件
 	fileList, err := filepath.Glob(pattern)
@@ -48,7 +51,7 @@ func (c *conf) Init() {
 	// 开始加载配置文件
 	for _, v := range fileList {
 		if !debug {
-			if strings.Index(v, DEBUG_SUFFIX) > -1 {
+			if strings.Index(v, DebugSuffix) > -1 {
 				continue
 			}
 		}
@@ -107,7 +110,7 @@ func (c *conf) loadFile(filePath string) bool {
 		tmp, err = ini.LoadFile(filePath)
 		if err != nil {
 			if err == os.ErrNotExist && debug {
-				filePath = strings.Replace(filePath, DEBUG_SUFFIX, NORAML_SUFFIX, 1)
+				filePath = strings.Replace(filePath, DebugSuffix, NoramlSuffix, 1)
 			} else {
 				log.Warring(err)
 				return false
@@ -133,16 +136,16 @@ func (c *conf) fileKey(filePath string) string {
 func (c *conf) fileSuffix(filePath ...string) string {
 	var fileSuffix string
 	if len(filePath) > 0 {
-		if strings.Index(filePath[0], DEBUG_SUFFIX) > 1 {
-			fileSuffix = DEBUG_SUFFIX
+		if strings.Index(filePath[0], DebugSuffix) > 1 {
+			fileSuffix = DebugSuffix
 		} else {
-			fileSuffix = NORAML_SUFFIX
+			fileSuffix = NoramlSuffix
 		}
 	} else {
 		if debug {
-			fileSuffix = DEBUG_SUFFIX
+			fileSuffix = DebugSuffix
 		} else {
-			fileSuffix = NORAML_SUFFIX
+			fileSuffix = NoramlSuffix
 		}
 	}
 
