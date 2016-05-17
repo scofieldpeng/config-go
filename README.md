@@ -29,9 +29,9 @@ val,ok := config.Config("test").Get("test","key") // val == value and ok == true
 // boolKey=true
 // intSlice=[1,2,3]
 
-intVal,ok := config.Int(config.Config("test").Get("test","intKey")) // intValue==1 and ok == true
-boolVal,ok := config.Bool(config.Config("test").Get("test","boolKey") // boolValue == true and ok == true
-intSlice,ok := config.IntSlice(config.Config("test").Get("test","intSlice") // intSlice == [1,2,3] and ok == true
+intVal := config.Int(config.Config("test").Get("test","intKey")) // intValue==1 and ok == true
+boolVal := config.Bool(config.Config("test").Get("test","boolKey") // boolValue == true and ok == true
+intSlice := config.IntSlice(config.Config("test").Get("test","intSlice") // intSlice == [1,2,3] and ok == true
 ```
 
 ## Licence

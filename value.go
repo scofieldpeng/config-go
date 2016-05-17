@@ -1,70 +1,70 @@
 package config
 
 import (
-    "strconv"
-    "github.com/pquerna/ffjson/ffjson"
+	"github.com/pquerna/ffjson/ffjson"
+	"strconv"
 )
 
-// Int 将config值转化为int类型,如果转化失败,第二个参数为false
-func Int(value string,ok bool)(int,bool) {
-    if !ok {
-        return 0,false
-    }
-    res,err := strconv.Atoi(value)
-    if err != nil {
-        return 0,false
-    }
-    return res,true
+// Int 将config值转化为int类型
+func Int(value string, ok bool) int {
+	if !ok {
+		return 0
+	}
+	res, err := strconv.Atoi(value)
+	if err != nil {
+		return 0
+	}
+	return res
 }
 
-// Int64 将config值转化为int64类型,如果转化失败,第二个参数为false
-func Int64(value string,ok bool)(int64,bool) {
-    if !ok {
-        return 0,false
-    }
-    res,err := strconv.ParseInt(value,10,64)
-    if err != nil {
-        return 0,false
-    }
+// Int64 将config值转化为int64类型
+func Int64(value string, ok bool) int64 {
+	if !ok {
+		return 0
+	}
+	res, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return 0
+	}
 
-    return res,true
+	return res
 }
 
-// Bool 将config值转化为bool类型,如果转化失败,第二个参数为false
-func Bool(value string,ok bool)(bool,bool) {
-    if !ok {
-        return false,false
-    }
-    res,err := strconv.ParseBool(value)
-    if err != nil {
-        return false,false
-    }
+// Bool 将config值转化为bool类型
+func Bool(value string, ok bool) bool {
+	if !ok {
+		return false
+	}
+	res, err := strconv.ParseBool(value)
+	if err != nil {
+		return false
+	}
 
-    return res,true
+	return res
 }
 
-// IntSlice 将config值转化为int的slice类型,如果转化失败,第二个参数为false
-func IntSlice(value string,ok bool)([]int,bool) {
-    if !ok {
-        return []int{},false
-    }
-    var res []int
-    if err := ffjson.Unmarshal([]byte(value),&res);err != nil {
-        return []int{},false
-    }
+// IntSlice 将config值转化为int的slice类型
+func IntSlice(value string, ok bool) []int {
+	if !ok {
+		return []int{}
+	}
+	var res []int
+	if err := ffjson.Unmarshal([]byte(value), &res); err != nil {
+		return []int{}
+	}
 
-    return res,true
+	return res
 }
 
-// Int64Slice 将config值转化为int的slice类型,如果转化失败,第二个参数为false
-func Int64Slice(value string,ok bool) ([]int64,bool) {
-    if !ok {
-        return []int64{},false
-    }
-    var res []int64
-    if err := ffjson.Unmarshal([]byte(value),&res);err != nil {
-        return []int64{},false
-    }
+// Int64Slice 将config值转化为int的slice类型
+func Int64Slice(value string, ok bool) []int64 {
+	if !ok {
+		return []int64{}
+	}
+	var res []int64
+	if err := ffjson.Unmarshal([]byte(value), &res); err != nil {
+		return []int64{}
+	}
 
-    return res,true
+	return res
 }
