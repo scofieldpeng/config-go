@@ -32,7 +32,8 @@ func New(dirPath string, debug bool) error {
 	if dirPath == "" {
 		dirPath = filepath.Dir(os.Args[0])
 	}
-	fileObj, err := os.Open(dirPath)
+	configPath := dirPath+ string(os.PathSeparator) + "config"
+	fileObj, err := os.Open(configPath)
 	if err != nil {
 		return err
 	}
@@ -61,7 +62,7 @@ func New(dirPath string, debug bool) error {
 					continue
 				}
 			}
-			tmp,err := ini.LoadFile(dirPath + string(os.PathSeparator) + configFile.Name())
+			tmp,err := ini.LoadFile(configPath + string(os.PathSeparator) + configFile.Name())
 			if err != nil {
 				return errors.New("read config file,file name:(" + configFile.Name() + ") fail!error:" + err.Error())
 			}
