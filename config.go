@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"git.name.im/bamboo/log.git"
+	"github.com/zhuziweb/log"
 	"github.com/howeyc/fsnotify"
 	"github.com/vaughan0/go-ini"
 )
