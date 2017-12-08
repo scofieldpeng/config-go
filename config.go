@@ -26,6 +26,8 @@ var (
 	c = config{}
 	// 兼容旧的调用方法,不建议使用
 	Config = c.data
+	// 版本号
+	Version = "v2.0"
 )
 
 // SetDebug 设置测试环境
