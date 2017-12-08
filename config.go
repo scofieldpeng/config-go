@@ -1,158 +1,72 @@
 package config
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-
-	"github.com/zhuziweb/log"
-	"github.com/howeyc/fsnotify"
 	"github.com/vaughan0/go-ini"
 )
 
-type conf map[string]ini.File
+type (
+	// Parser 接口结构体
+	Parser interface {
+		// Parse 解析方法
+		Parse() (map[string]ini.File, error)
+	}
+	// config config 结构体对象
+	config struct {
+		// data 存储着具体的 config 参数
+		data map[string]ini.File
+		// Debug 是否是 debug 模式
+		Debug bool
+		// Parser 解析器
+		parser Parser
+	}
+)
 
-// Config 对外提供的config参数
-var Config = conf{}
-
-//  是否为测试环境
-var debug bool
+var (
+	// Config 对外提供的config参数
+	c = config{}
+	// 兼容旧的调用方法,不建议使用
+	Config = c.data
+	// 版本号
+	Version = "v2.0"
+)
 
 // SetDebug 设置测试环境
 func SetDebug(b bool) {
-	debug = b
-	log.SetDebug(b)
+	c.Debug = b
 }
 
 // Debug 返回debug状态
 func Debug() bool {
-	return debug
+	return c.Debug
 }
 
-const (
-	// NoramlSuffix 正常配置文件后缀
-	NoramlSuffix = ".ini"
-	// DebugSuffix debug模式配置文件后缀
-	DebugSuffix = "_debug.ini"
-)
+// Data 获取数据
+func Data(fileName string) ini.File {
+	return c.data[fileName]
+}
+
+// Init 初始化
+func Init(debug bool, parser ...Parser) (err error) {
+	return c.init(debug, parser...)
+}
+
+// Reload 重新载入
+func Reload() error {
+	return c.Load()
+}
 
 // Init 初始化配置文件
-func (c *conf) Init() {
-	// 加载所有的配置文件
-	pattern := fmt.Sprintf("%s*%s", c.ConfigPath(), NoramlSuffix)
-
-	// 扫描目录找到配置文件
-	fileList, err := filepath.Glob(pattern)
-	if err != nil {
-		log.Panic(err)
+func (c *config) init(debug bool, parser ...Parser) (err error) {
+	c.Debug = debug
+	if len(parser) == 0 {
+		parser[0] = FileParser{Debug: c.Debug}
 	}
-
-	// 开始加载配置文件
-	for _, v := range fileList {
-		if !debug {
-			if strings.Index(v, DebugSuffix) > -1 {
-				continue
-			}
-		}
-		c.loadFile(v)
-	}
-
-	// 文件加载完成的时候，开始监听文件的变化
-	go c.Watch()
-
+	c.parser = parser[0]
+	return c.Load()
 }
 
-// Watcher 监听文件的变化
-func (c *conf) Watch() {
-	configPath := c.ConfigPath()
-
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		log.Panic(err)
-	}
-	defer watcher.Close()
-
-	err = watcher.Watch(configPath)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	fileSuffix := c.fileSuffix()
-
-	for {
-		select {
-		case v := <-watcher.Event:
-			// 判断是否为配置文件变化
-			if !strings.HasSuffix(v.Name, fileSuffix) {
-				break
-			}
-
-			// 当为删除、重命名操作时，删除对应的配置项
-			if v.IsDelete() || v.IsRename() {
-				delete((*c), c.fileKey(v.Name))
-			}
-
-			// 当为修改、创建操作时
-			if v.IsModify() || v.IsCreate() {
-				c.loadFile(v.Name)
-			}
-		}
-	}
-
-}
-
-// loadFile 加载配置文件
-func (c *conf) loadFile(filePath string) bool {
-	var tmp ini.File
-	var err error
-	for {
-		tmp, err = ini.LoadFile(filePath)
-		if err != nil {
-			if err == os.ErrNotExist && debug {
-				filePath = strings.Replace(filePath, DebugSuffix, NoramlSuffix, 1)
-			} else {
-				log.Warring(err)
-				return false
-			}
-		} else {
-			break
-		}
-	}
-
-	// 计算文件的名称
-	(*c)[c.fileKey(filePath)] = tmp
-	return true
-}
-
-// fileKey　通过文件地址获取文件对应的key
-// 通过 filePath 参数来获取对应的文件名做为key
-func (c *conf) fileKey(filePath string) string {
-	return strings.Replace(filepath.Base(filePath), c.fileSuffix(filePath), "", -1)
-}
-
-// fileSuffix 配置文件对应的后缀
-// filePath 当设置了文件路径的时候，通过判断是否有debug文件后缀来确定其使用的是哪种后缀
-func (c *conf) fileSuffix(filePath ...string) string {
-	var fileSuffix string
-	if len(filePath) > 0 {
-		if strings.Index(filePath[0], DebugSuffix) > 1 {
-			fileSuffix = DebugSuffix
-		} else {
-			fileSuffix = NoramlSuffix
-		}
-	} else {
-		if debug {
-			fileSuffix = DebugSuffix
-		} else {
-			fileSuffix = NoramlSuffix
-		}
-	}
-
-	return fileSuffix
-}
-
-// ConfigPath 获取配置文件存储目录
-func (c *conf) ConfigPath() string {
-	return fmt.Sprintf("%s/config/", log.RunDir())
+func (c *config) Load() (err error) {
+	c.data, err = c.parser.Parse()
+	Config = c.data
+	return
 }
