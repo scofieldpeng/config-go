@@ -1,6 +1,8 @@
 package config
 
-import "strconv"
+import (
+	"strconv"
+)
 
 // String 返回String类型的数据
 func String(val string, b bool) string {

@@ -1,46 +1,92 @@
 # config
 
-通用配置组件，可用于ini配置文件的管理
+一款简单的配置服务,使用.ini 文件来作为配置源
 
-组件会自动监听配置文件的变化，并更新配置数据
+## 快速使用
 
-## 配置文件存储目录
+```go
+go get github.com/zhuziweb/config
+```
 
-配置文件应存储在程序运行的根目录下的`config`目录中。
+### 1. 初始化
 
-## 初始化
+```go
+if err := config.Init(true);err != nil {
+    log.Info(err)
+    os.Exit(1)
+}
+```
 
-在主程序是使用以下方式进行初始化
+在应用同级目录下创建 config 目录，专门用于管理配置文件，例如：
 
-> config.Config.Init()
+```bash
+/example-app
+ |- /config
+ |    |- app.ini # release 环境会读取到该文件
+ |    |- app_debug.ini # debug 环境会读取到该文件 
+ |- app.go    
+```
 
-## Debug模式
+### 2. 使用
 
-以下语句开启debug模式
-> config.SetDebug(ture)
+假设现在是 debug 模式，app_debug.ini 有如下配置
 
-当配置文件存在着在其文件名上加_debug的另一个文件时，debug 模式下将会优先加载_debug文件，当不存在_debug文件时加载原文件。
-如：有app.ini的文件，同时还有app_debug.ini文件，当为debug模式时会优先加载app_debug.ini。如果app_debug.ini不存在时，将加载app.ini文件
+```ini
+# app_debug.ini
+[info]
+version=1.0
+```
 
-在正常模式下都只加载app.ini文件
+```go
+// 第一个参数返回 version 值，如果不存在，第二个参数返回 false
+// 其中的Data("app")中的 app 值为 app.ini（debug 模式下会读取 app_debug.ini 下的值）
+version,ok := config.Data("app").Get("info","version")
+
+// 另一种快捷方法
+version := config.String(config.Data("app").Get("info","version"))
+```
+
+## 重载配置
+
+```go
+err := config.Reload()
+```
+
+## 快速获取对应类型的值
+
+**字符:**
+
+```go
+string := config.String(config.Config["app"].Get("mysql", "default"))
+```
+
+**整数:**
+
+```go
+int := config.Int(config.Config["app"].Get("mysql", "default"))
+```
 
 
-## 获取配置
+**浮点数:**
 
-如要获取`app.ini`中的mysql节点下的default配置项
+```go
+float64 := config.Float64(config.Config["app"].Get("mysql", "default"))
+```
 
-> string, err := config.Config["app"].Get("mysql", "default")
+**布尔值:**
 
-## 直接处理类型值
+```gp
+bool := config.bool(config.Config["app"].Get("mysql", "default"))
+```
 
-字符
-> string := config.String(config.Config["app"].Get("mysql", "default"))
+## 自定义配置文件目录
 
-整数
-> int := config.Int(config.Config["app"].Get("mysql", "default"))
+```go
+// 路径必须为绝对路径，并且以/结尾
+absolutePath := `/home/namer/app/config/`
+config.Init( debug, NewFileParser(absolutePath))
+```
 
-浮点数
-> float64 := config.Float64(config.Config["app"].Get("mysql", "default"))
+## 具体 API
 
-布尔值
-> bool := config.bool(config.Config["app"].Get("mysql", "default"))
+详见[godoc.org/github.com/zhuziweb/config](godoc.org/github.com/zhuziweb/config)
