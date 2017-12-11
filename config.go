@@ -59,6 +59,7 @@ func Reload() error {
 func (c *config) init(debug bool, parser ...Parser) (err error) {
 	c.Debug = debug
 	if len(parser) == 0 {
+		parser = make([]Parser, 1)
 		parser[0] = FileParser{Debug: c.Debug}
 	}
 	c.parser = parser[0]
