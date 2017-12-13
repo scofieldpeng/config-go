@@ -110,12 +110,12 @@ type Parser interface {
 ### ManualParser用法
 
 ```go
-p := config.NewManualParser()
-
-如果有如下配置想手动注入
+// 如果有如下配置想手动注入
 // app.ini
 // [system]
 // version = beta0.1
+
+p := config.NewManualParser()
 
 // 方法1
 p.SetConfig("app","system","version","beta0.1")
