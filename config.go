@@ -46,6 +46,7 @@ func Data(fileName string) ini.File {
 }
 
 // Init 初始化
+// 默认会读取fileParse(v1)来进行操作
 func Init(debug bool, parser ...Parser) (err error) {
 	return c.init(debug, parser...)
 }

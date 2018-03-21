@@ -87,6 +87,33 @@ absolutePath := `/home/namer/app/config/`
 config.Init( debug, NewFileParser(absolutePath))
 ```
 
+## 文件解析器的debug模式和非debug模式
+
+在使用文件作为config时，默认情况下debug模式下会读取配置目录下的xxx_debug.ini文件，非debug读取xxx.ini文件
+
+有时候我们不想进行_debug.ini和非_debug.ini的区分，如果有此需求，采用v2的默认解析器(文件解析)即可,用法
+
+方法1： 添加环境变量CONFIG_VERSION=v2的值即可
+
+方法2: 初始化时用v2进行初始化:
+
+```go
+config.Init(debug,config.NewFileParserV2())
+```
+
+## 环境变量配置文件
+
+某些时候，我们的某些配置是是需要写成环境变量实现动态生成配置，默认的文件解析器支持环境变量，语法为${ENV_NAME},例如有下列配置文件
+
+```ini
+# app.ini
+[redis]
+default=${REDIS_DEFAULT_ADDR}
+```
+
+上面的${REDIS_DEFAULT_ADDR}代表该值需要用环境变量来替换，如果在运行时指代了环境变量，那么config在初始化后会默认将该值替换成对应的值
+
+
 ## 具体 API
 
 详见[godoc.org/github.com/zhuziweb/config](godoc.org/github.com/zhuziweb/config)
