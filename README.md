@@ -82,9 +82,11 @@ bool := config.bool(config.Config["app"].Get("mysql", "default"))
 ## 自定义配置文件目录
 
 ```go
+// 设置debug环境
+debug := false
 // 路径必须为绝对路径，并且以/结尾
 absolutePath := `/home/namer/app/config/`
-config.Init( debug, NewFileParser(absolutePath))
+config.Init( debug, NewFileParser(debug,absolutePath))
 ```
 
 ## 文件解析器的debug模式和非debug模式
@@ -98,7 +100,7 @@ config.Init( debug, NewFileParser(absolutePath))
 方法2: 初始化时用v2进行初始化:
 
 ```go
-config.Init(debug,config.NewFileParserV2())
+config.Init(debug,config.NewFileParserV2(debug))
 ```
 
 ## 环境变量配置文件

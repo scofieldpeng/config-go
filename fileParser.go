@@ -45,21 +45,27 @@ const (
 )
 
 // NewFileParser 新建文件 Parser
-func NewFileParser(configPath ...string) FileParser {
-	parser := NewFileParserV1(configPath...)
+func NewFileParser(debug bool, configPath ...string) FileParser {
+	parser := NewFileParserV1(debug, configPath...)
 
 	version := os.Getenv("CONFIG_VERSION")
-	switch strings.ToLower(version) {
-	case V2:
-		parser.Version = V2
-	case V1:
-		parser.Version = V1
+	if version != "" {
+		switch strings.ToLower(version) {
+		case V2:
+			parser.Version = V2
+		case V1:
+			parser.Version = V1
+		default:
+			parser.Version = V1
+		}
 	}
+
+	fmt.Println("default version:", parser.Version)
 
 	return parser
 }
 
-func NewFileParserV1(configPath ...string) FileParser {
+func NewFileParserV1(debug bool, configPath ...string) FileParser {
 	if len(configPath) == 0 {
 		configPath = make([]string, 1)
 		configPath[0] = FileParser{}.defaultConfigPath()
@@ -67,12 +73,13 @@ func NewFileParserV1(configPath ...string) FileParser {
 	return FileParser{
 		Path:    configPath[0],
 		Version: V1,
+		Debug:   debug,
 	}
 }
 
 // 新建文件Parser（v2）版本
-func NewFileParserV2(configPath ...string) FileParser {
-	p := NewFileParser(configPath...)
+func NewFileParserV2(debug bool, configPath ...string) FileParser {
+	p := NewFileParser(debug, configPath...)
 	p.Version = V2
 
 	return p
@@ -101,6 +108,7 @@ func (f FileParser) Parse() (data map[string]ini.File, err error) {
 
 	// 读取配置文件的版本需要根据实现不同来实现，比如说如何根据
 	// 当为v1的时候，debug环境会读取xxx_debug.ini文件
+	fmt.Println("version:", f.Version)
 	for _, v := range tmpFileList {
 		if f.Version == V1 {
 			if strings.HasSuffix(v, debugSuffix) && !f.Debug {
