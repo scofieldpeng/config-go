@@ -89,6 +89,11 @@ absolutePath := `/home/namer/app/config/`
 config.Init( debug, NewFileParser(debug,absolutePath))
 ```
 
+或者将上面代码中的absolutePaht定义成`APP_CONFIG_DIR`的环境变量,就可以直接使用：
+```go
+config.Init(debug)
+```
+
 ## 文件解析器的debug模式和非debug模式
 
 在使用文件作为config时，默认情况下debug模式下会读取配置目录下的xxx_debug.ini文件，非debug读取xxx.ini文件
