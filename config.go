@@ -64,7 +64,6 @@ func (c *config) init(debug bool, parser ...Parser) (err error) {
 		parser[0] = NewFileParser(debug)
 	}
 	c.parser = parser[0]
-
 	// 设置环境变量
 
 	return c.Load()

@@ -35,6 +35,9 @@ const (
 	releaseSuffix = ".ini"
 	// debugSuffix debug模式配置文件后缀
 	debugSuffix = "_debug.ini"
+
+	// 应用配置目录的环境变量
+	envConfigDir = "APP_CONFIG_DIR"
 )
 
 const (
@@ -204,7 +207,12 @@ func (f FileParser) runDir() string {
 
 // defaultConfigPath 默认的 config 路径
 func (f FileParser) defaultConfigPath() string {
-	return fmt.Sprintf("%s/config/", f.runDir())
+	// 检测是否有配置文件的环境变量，没有从默认的读取
+	path := os.Getenv(envConfigDir)
+	if path == "" {
+		path = fmt.Sprintf("%s/config/", f.runDir())
+	}
+	return path
 }
 
 // 载入环境变量
