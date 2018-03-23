@@ -87,6 +87,7 @@ func NewFileParserV2(debug bool, configPath ...string) FileParser {
 
 // Parse 解析
 func (f FileParser) Parse() (data map[string]ini.File, err error) {
+
 	data = make(map[string]ini.File)
 	var (
 		tmpData ini.File
@@ -105,6 +106,8 @@ func (f FileParser) Parse() (data map[string]ini.File, err error) {
 	if err != nil {
 		return
 	}
+	// 载入环境变量
+	f.loadEnv()
 
 	// 读取配置文件的版本需要根据实现不同来实现，比如说如何根据
 	// 当为v1的时候，debug环境会读取xxx_debug.ini文件
@@ -202,4 +205,12 @@ func (f FileParser) runDir() string {
 // defaultConfigPath 默认的 config 路径
 func (f FileParser) defaultConfigPath() string {
 	return fmt.Sprintf("%s/config/", f.runDir())
+}
+
+// 载入环境变量
+func (f FileParser) loadEnv() {
+	e := newEnv(f.Path + ".env")
+	if err := e.Parse(); err == nil {
+		e.Set()
+	}
 }

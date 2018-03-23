@@ -3,12 +3,14 @@
 一款简单的配置服务,使用.ini 文件来作为配置源
 
 ## 快速使用
+---
 
 ```go
 go get github.com/zhuziweb/config
 ```
 
 ### 1. 初始化
+---
 
 ```go
 if err := config.Init(true);err != nil {
@@ -28,6 +30,7 @@ if err := config.Init(true);err != nil {
 ```
 
 ### 2. 使用
+---
 
 假设现在是 debug 模式，app_debug.ini 有如下配置
 
@@ -47,12 +50,14 @@ version := config.String(config.Data("app").Get("info","version"))
 ```
 
 ## 重载配置
+---
 
 ```go
 err := config.Reload()
 ```
 
 ## 快速获取对应类型的值
+---
 
 **字符:**
 
@@ -80,6 +85,7 @@ bool := config.bool(config.Config["app"].Get("mysql", "default"))
 ```
 
 ## 自定义配置文件目录
+---
 
 ```go
 // 设置debug环境
@@ -90,6 +96,7 @@ config.Init( debug, NewFileParser(debug,absolutePath))
 ```
 
 ## 文件解析器的debug模式和非debug模式
+---
 
 在使用文件作为config时，默认情况下debug模式下会读取配置目录下的xxx_debug.ini文件，非debug读取xxx.ini文件
 
@@ -104,6 +111,7 @@ config.Init(debug,config.NewFileParserV2(debug))
 ```
 
 ## 环境变量配置文件
+---
 
 某些时候，我们的某些配置是是需要写成环境变量实现动态生成配置，默认的文件解析器支持环境变量，语法为${ENV_NAME},例如有下列配置文件
 
@@ -125,11 +133,16 @@ default=${REDIS_DEFAULT_ADDR:=127.0.0.1:6379}
 
 当找不到REDIS_DEFAULT_ADDR这个环境变量时，default值会用127.0.0.1:6379去填充
 
+> 快捷设置环境变量
+> 在配置文件的同目录下建立`.env`文件，一行一个，KEY=VALUE格式即可，程序启动时会自动将该文件的值设置到环境变量
+
 ## 具体 API
+---
 
 详见[godoc.org/github.com/zhuziweb/config](godoc.org/github.com/zhuziweb/config)
 
 ## 添加手动解析
+---
 
 只要实现了Parser结构体即可:
 
@@ -146,6 +159,7 @@ type Parser interface {
 系统已经内置了FileParser和ManualParser结构体，前者为默认的解析器，用于解析文件格式的配置，后者用户配置成手动注入的解析器
 
 ### ManualParser用法
+---
 
 ```go
 // 如果有如下配置想手动注入
