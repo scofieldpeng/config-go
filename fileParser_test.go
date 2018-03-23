@@ -8,8 +8,7 @@ import (
 // TestFileParser_Parse 测试文件解析器
 func TestFileParser_Parse(t *testing.T) {
 	configPath := os.Getenv("GOPATH") + "/src/github.com/zhuziweb/config/config/"
-	parser := NewFileParser(configPath)
-	parser.Debug = true
+	parser := NewFileParser(true, configPath)
 	data, err := parser.Parse()
 	if err != nil {
 		t.Error("debug时解析出错,err:", err.Error())
@@ -28,4 +27,6 @@ func TestFileParser_Parse(t *testing.T) {
 	if version != "v2.0" {
 		t.Error("release 时读取 app:version 值不正确,version:", version)
 	}
+
+
 }

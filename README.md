@@ -115,6 +115,15 @@ default=${REDIS_DEFAULT_ADDR}
 
 上面的${REDIS_DEFAULT_ADDR}代表该值需要用环境变量来替换，如果在运行时指代了环境变量，那么config在初始化后会默认将该值替换成对应的值
 
+有时候我们需要当环境变量不存在时设置默认值，那么可以设置为这样
+
+```ini
+# app.ini
+[redis]
+default=${REDIS_DEFAULT_ADDR:=127.0.0.1:6379}
+```
+
+当找不到REDIS_DEFAULT_ADDR这个环境变量时，default值会用127.0.0.1:6379去填充
 
 ## 具体 API
 

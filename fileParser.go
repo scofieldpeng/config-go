@@ -108,7 +108,6 @@ func (f FileParser) Parse() (data map[string]ini.File, err error) {
 
 	// 读取配置文件的版本需要根据实现不同来实现，比如说如何根据
 	// 当为v1的时候，debug环境会读取xxx_debug.ini文件
-	fmt.Println("version:", f.Version)
 	for _, v := range tmpFileList {
 		if f.Version == V1 {
 			if strings.HasSuffix(v, debugSuffix) && !f.Debug {
@@ -145,26 +144,37 @@ func (f FileParser) parseFile(path string) (data ini.File, err error) {
 	}
 	defer file.Close()
 
-	// 检测是否有环境变量，如果有值，替换掉
-	// ${ENV}则为读取env的值进行替换
-	// TODO 这里有很多优化空间，鉴于时间和各种成本因素，后期考虑
 	if fileBytes, err = ioutil.ReadAll(file); err != nil {
 		return
 	}
-	fileStr = string(fileBytes)
-	reg := regexp.MustCompile(`\$\{([a-zA-Z0-9\-\_]+)\}`)
-	findRes := reg.FindAllStringSubmatch(fileStr, 1)
-	for _, v := range findRes {
-		if len(v) > 1 {
-			if env := os.Getenv(v[1]); env != "" {
-				fileStr = strings.Replace(fileStr, v[0], env, -1)
-			}
-		}
-	}
+	fileStr = f.replaceEnvVar(string(fileBytes))
 
 	// 解析配置文件
 	data, err = ini.Load(strings.NewReader(fileStr))
 	return
+}
+
+// 解析字符串中的环境变量并且替换成对应的值,如果找不到，用默认值替换，如果没有默认值，该值为空
+// name=${NAME:=scofield}
+// 会被替换为:
+//     1. 如果有环境变量NAME，假设环境变量NAME的值为julia，那么结果为name=julia
+//     2. 如果没有环境变量NAME，结果为name=scofield
+func (f FileParser) replaceEnvVar(data string) string {
+	pattern := regexp.MustCompile(`\$\{(?P<name>[a-zA-Z0-9\-\_]+)(?:\:=)?(?P<default>.*)?\}`)
+	findRes := pattern.FindAllStringSubmatch(data, -1)
+	for _, v := range findRes {
+		replaceV := ""
+		if len(v) == 3 {
+			if env := os.Getenv(v[1]); env != "" {
+				replaceV = env
+			} else if v[2] != "" {
+				replaceV = v[2]
+			}
+		}
+		data = strings.Replace(data, v[0], replaceV, -1)
+	}
+
+	return data
 }
 
 // getFileKey 获取文件的 key,key 是指 app.ini 中 key的值为 app

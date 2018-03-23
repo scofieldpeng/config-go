@@ -8,7 +8,7 @@ import (
 func TestConfig_Init(t *testing.T) {
 	os.Setenv("TEST_NAME", "helloworld")
 	appDir := os.Getenv("GOPATH") + "/src/go.zhuzi.me/config/example/"
-	fileParser := NewFileParser(appDir)
+	fileParser := NewFileParser(true, appDir)
 	fileParser.Debug = true
 	if err := Init(true, fileParser); err != nil {
 		t.Error(err)
@@ -27,7 +27,7 @@ func TestConfig_Init(t *testing.T) {
 	}
 
 	// test v2
-	fileParser = NewFileParserV2(appDir)
+	fileParser = NewFileParserV2(true, appDir)
 	Init(true, fileParser)
 	version = String(Data("test_debug").Get("app", "version"))
 	if "v2.1" != version {
@@ -39,11 +39,20 @@ func TestConfig_Init(t *testing.T) {
 	}
 
 	// 测试环境变量替换
-	fileParser = NewFileParserV1(appDir)
+	fileParser = NewFileParserV1(true, appDir)
 	Init(true, fileParser)
 	if envVal := String(Data("test").Get("app", "env")); envVal != "" {
 		if envVal != os.Getenv("TEST_NAME") {
-			t.Error("环境变量读取失败,env:", envVal,",right:",os.Getenv("TEST_NAME"))
+			t.Error("环境变量读取失败,env:", envVal, ",right:", os.Getenv("TEST_NAME"))
 		}
+	}
+
+	os.Clearenv()
+	Init(true, fileParser)
+	if envVal := String(Data("test").Get("app", "env")); envVal != "helloworld" {
+		t.Error("读取环境变量默认值失败,env:", envVal, ",right:helloworld")
+	}
+	if envVal2 := String(Data("test").Get("app", "env2")); envVal2 != "" {
+		t.Error("读取不存在的环境变量失败,env2:", envVal2, ",right:空值")
 	}
 }
