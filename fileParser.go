@@ -166,7 +166,7 @@ func (f FileParser) parseFile(path string) (data ini.File, err error) {
 //     1. 如果有环境变量NAME，假设环境变量NAME的值为julia，那么结果为name=julia
 //     2. 如果没有环境变量NAME，结果为name=scofield
 func (f FileParser) replaceEnvVar(data string) string {
-	pattern := regexp.MustCompile(`\$\{(?P<name>[a-zA-Z0-9\-\_]+)(?:\:=)?(?P<default>.*)?\}`)
+	pattern := regexp.MustCompile(`\$\{(?P<name>[a-zA-Z]+[a-zA-Z0-9\-\_]*)(?:\:=)?(?P<default>[^${}]*)?\}`)
 	findRes := pattern.FindAllStringSubmatch(data, -1)
 	for _, v := range findRes {
 		replaceV := ""
