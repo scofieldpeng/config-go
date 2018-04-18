@@ -5,7 +5,7 @@
 ## 快速使用
 
 ```go
-go get github.com/zhuziweb/config
+go get github.com/scofieldpeng/config
 ```
 
 ### 1. 初始化
@@ -85,7 +85,7 @@ bool := config.bool(config.Config["app"].Get("mysql", "default"))
 // 设置debug环境
 debug := false
 // 路径必须为绝对路径，并且以/结尾
-absolutePath := `/home/namer/app/config/`
+absolutePath := `/home/scofield/app/config/`
 config.Init( debug, NewFileParser(debug,absolutePath))
 ```
 
@@ -135,7 +135,7 @@ default=${REDIS_DEFAULT_ADDR:=127.0.0.1:6379}
 
 ## 具体 API
 
-详见[godoc.org/github.com/zhuziweb/config](godoc.org/github.com/zhuziweb/config)
+详见[godoc.org/github.com/scofieldpeng/config](godoc.org/github.com/scofieldpeng/config)
 
 ## 添加手动解析
 
