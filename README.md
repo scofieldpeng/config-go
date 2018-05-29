@@ -5,7 +5,7 @@
 ## 快速使用
 
 ```go
-go get github.com/scofieldpeng/config
+go get github.com/scofieldpeng/config-go
 ```
 
 ### 1. 初始化
@@ -135,7 +135,7 @@ default=${REDIS_DEFAULT_ADDR:=127.0.0.1:6379}
 
 ## 具体 API
 
-详见[godoc.org/github.com/scofieldpeng/config](godoc.org/github.com/scofieldpeng/config)
+详见[godoc.org/github.com/scofieldpeng/config-go](godoc.org/github.com/scofieldpeng/config)
 
 ## 添加手动解析
 
